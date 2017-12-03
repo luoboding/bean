@@ -41,7 +41,7 @@ export const Bean = {
                 pageInstance.viewDidAppear();
                 const template = pageInstance.render();
                 // TODO: 解析模板
-                $([this.rootElement]).on('click', (e) => {
+                $([this.rootElement]).off('click').on('click', (e) => {
                     const eventTarget = e.target;
                     const hasClickEvent = eventTarget.hasAttribute('@click');
                     if (hasClickEvent) {
@@ -57,13 +57,12 @@ export const Bean = {
                         }
                     }
                 });
-                $([this.rootElement]).on('change', (e) => {
+                $([this.rootElement]).off('change').on('change', (e) => {
                     const eventTarget = e.target;
                     const hasClickEvent = eventTarget.hasAttribute('@change');
                     if (hasClickEvent) {
                         const clickMethod = eventTarget.getAttribute('@change');
                         try {
-                            window.pageInstance = pageInstance;
                             if (!pageInstance.hasOwnProperty(clickMethod)) {
                                 throw new Error(`no method ${clickMethod} founded in current controller`);
                             }
@@ -85,7 +84,6 @@ export const Bean = {
         const hash = currentLocation.hash;
         this.handleRouteChange(hash);
         window.addEventListener('hashchange', (evt) => {
-            console.log('change');
             const newURL = evt.newURL;
             const urlObject = new URL(newURL);
             const hash = urlObject.hash;

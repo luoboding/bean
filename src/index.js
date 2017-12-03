@@ -1,4 +1,4 @@
-import { Bean } from './bean';
+import { Bean } from './common/bean';
 import IndexController from './index/controller';
 import LoginController from './login/controller';
 import './index.css';
