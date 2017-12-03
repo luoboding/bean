@@ -5,17 +5,16 @@ export const Bean = {
     compile(template) {
         $([this.rootElement]).html(template);
     },
-    render(rootElement, configMapping) {
-        this.rootElement = rootElement;
-        const currentLocation = window.location;
-        let hash = currentLocation.hash;
-        window.addEventListener('hashchange', (evt) => {
-            const newURL = evt.newURL;
-            const urlObject = new URL(newURL);
-            hash = urlObject.hash;
-        }, false);
+    handleRouteChange(hash) {
+        const configMapping = this.configMapping;
         const hashPath = hash.substring(1, ((hash.indexOf('?') === -1) ? hash.length : hash.indexOf('?')) );
         const keys = Object.keys(configMapping);
+        if (keys.indexOf('/') === -1) {
+            throw new Error('you must have a root route in your route config');
+        }
+        if (!hashPath) {
+            window.location.hash = "/";
+        }
         if (keys.indexOf(hashPath) === -1) {
             throw new Error(`no matched route: ${hashPath}`);
         }
@@ -42,7 +41,7 @@ export const Bean = {
                 pageInstance.viewDidAppear();
                 const template = pageInstance.render();
                 // TODO: 解析模板
-                $([rootElement]).on('click', (e) => {
+                $([this.rootElement]).on('click', (e) => {
                     const eventTarget = e.target;
                     const hasClickEvent = eventTarget.hasAttribute('@click');
                     if (hasClickEvent) {
@@ -58,7 +57,7 @@ export const Bean = {
                         }
                     }
                 });
-                $([rootElement]).on('change', (e) => {
+                $([this.rootElement]).on('change', (e) => {
                     const eventTarget = e.target;
                     const hasClickEvent = eventTarget.hasAttribute('@change');
                     if (hasClickEvent) {
@@ -78,5 +77,20 @@ export const Bean = {
                 break;
             }
         }
+    },
+    render(rootElement, configMapping) {
+        this.rootElement = rootElement;
+        this.configMapping = configMapping;
+        const currentLocation = window.location;
+        const hash = currentLocation.hash;
+        this.handleRouteChange(hash);
+        window.addEventListener('hashchange', (evt) => {
+            console.log('change');
+            const newURL = evt.newURL;
+            const urlObject = new URL(newURL);
+            const hash = urlObject.hash;
+            this.handleRouteChange(hash);
+        }, true);
+        
     }
 }
