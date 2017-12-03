@@ -14,6 +14,7 @@ export const Bean = {
         }
         if (!hashPath) {
             window.location.hash = "/";
+            return;
         }
         if (keys.indexOf(hashPath) === -1) {
             throw new Error(`no matched route: ${hashPath}`);
