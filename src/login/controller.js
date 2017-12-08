@@ -1,11 +1,12 @@
+import { observer } from './../common/observer';
 import Controller from "./../common/controller";
 import './assets/login.css'
 
 export default class LoginController extends Controller {
     data = {}
     constructor(params) {
-        super(params);
-        this.model = this.Model({})
+      super(params);
+      this.model = observer({});
     }
     viewDidLoad() {
         super.viewDidLoad();
@@ -17,21 +18,18 @@ export default class LoginController extends Controller {
         super.viewDidAppear();
     }
     login = () => {
-        this.model.updateModel(this.data);
+        // this.model.updateModel(this.data);
     }
     userNameChange = (e) => {
-        Object.assign(this.data, {
-            username: e.target.value,
-        });
+        console.log('userNameChange e', e);
         this.model.username = e.target.value;
     }
     passwordChange = (e) => {
-        Object.assign(this.data, {
-            password: e.target.value,
-        });
+        console.log('passwordChange e', e);
+        this.model.password = e.target.value;
     }
     render() {
-        console.log('routeParam', this.routeParam)
+        console.log('routeParam', this.model)
         return `
             <div class='page-login'>
                 <h1 class='login-title'>login page</h1>

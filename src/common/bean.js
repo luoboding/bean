@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import pathToRegexp from 'path-to-regexp';
-
+import { observer } from './observer';
 export const Bean = {
     compile(template) {
         $([this.rootElement]).html(template);
@@ -37,6 +37,11 @@ export const Bean = {
                 Object.assign(pageInstance, {
                     routeParam,
                 });
+                pageInstance.model = observer({}, (target, key) => {
+                   const value = target[key];
+                   Bean.compile(pageInstance.render());
+                });
+                
                 pageInstance.viewDidLoad();
                 pageInstance.viewWillAppear();
                 pageInstance.viewDidAppear();
