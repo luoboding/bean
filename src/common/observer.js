@@ -7,23 +7,19 @@ export function observer(target, registerReactionForKey) {
   const handler = {
     set(target, key, value, receiver) {
       invariant(key, 'set');
+      if (typeof key === 'symbol') {
+          return Reflect.set(target, key, value, receiver);
+      }
       /**
-         * symbol key should be ignored
-         */
-        if (typeof key === 'symbol') {
-            return Reflect.set(target, key, value, receiver);
-        }
-        /**
-         * array can update length; 
-         * value must be changed
-         */
-        if (key === 'length' || target[key] !== value) {
-            /**
-             * register reaction
-             */
-            registerReactionForKey(target, key);
-        }
-        return Reflect.set(target, key, value, receiver);
+       * array can update length;
+       * value must be changed
+       */
+      if (key === 'length' || target[key] !== value) {
+          const result = Reflect.set(target, key, value, receiver);
+          registerReactionForKey(target, key);
+          return result;
+      }
+      return Reflect.set(target, key, value, receiver);
     },
     get(target, key, receiver) {
         invariant(key, 'set');
@@ -31,17 +27,21 @@ export function observer(target, registerReactionForKey) {
     },
     defineProperty(target, key, descriptor) {
         if (typeof key !== 'symbol') {
-            registerReactionForKey(target, key);
+          const result = Reflect.defineProperty(target, key, descriptor);
+          registerReactionForKey(target, key);
+          return result;
         }
         return Reflect.defineProperty(target, key, descriptor);
     },
     deleteProperty (target, key) {
         /**
          * only queue reactions for non symbol keyed property delete which resulted in an actual change
-         * it will be ignored when delete a property 
+         * it will be ignored when delete a property
          */
         if (typeof key !== 'symbol' && key in target) {
-            registerReactionForKey(target, key);
+          const result = Reflect.deleteProperty(target, key)
+          registerReactionForKey(target, key);
+          return result;
         }
         return Reflect.deleteProperty(target, key)
     }

@@ -1,5 +1,3 @@
-import { Bean } from "./bean";
-import { Reflect } from "core-js/library/web/timers";
 export default class Controller {
     constructor(params) {
         console.log('super params', params);
